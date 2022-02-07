@@ -1,0 +1,6 @@
+---
+# handlers file for Unboundsible
+- name: Restart unbound
+  ansible.builtin.service:
+    name: unbound
+    state: restarted

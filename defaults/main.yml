@@ -1,0 +1,30 @@
+---
+# defaults file for Unboundsible
+interfaces:
+  - 0.0.0.0
+  - ::0
+interface_port: 53
+do_ipv4: "yes"
+do_ipv6: "yes"
+acl:
+  - range: 127.0.0.0/8
+    state: allow
+  - range: 0.0.0.0/0
+    state: deny
+  - range: ::1
+    state: allow
+  - range: ::0/0
+    state: deny
+log_queries: "yes"
+log_replies: "yes"
+identity: Query me baby one more time!
+upstream_resolvers:
+  # All default servers are hosted by non-profits
+  # who claim to not log
+  - 5.1.66.255 # Freifunk Munich
+  - 37.235.1.174 # freedns.zone
+  - 172.104.49.100 # freedns.zone
+remote_control: "yes"
+control_interface: 127.0.0.1
+dot: no
+doh: no

@@ -1,0 +1,21 @@
+---
+# tasks file for Unboundsible
+- name: Install unbound
+  ansible.builtin.apt:
+    name: unbound
+    state: present
+- name: Copy private key and certificate for DoH
+  ansible.builtin.include_tasks: doh.yml
+  when: doh == "yes"
+- name: Copy private key and certificate for DoT
+  ansible.builtin.include_tasks: dot.yml
+  when: dot == "yes"
+- name: Copy unbound-configuration
+  ansible.builtin.template:
+    src: unbound.conf.j2
+    dest: /etc/unbound/unbound.conf
+    owner: root
+    group: root
+    mode: '0640'
+  notify:
+    - Restart unbound

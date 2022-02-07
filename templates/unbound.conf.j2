@@ -1,0 +1,63 @@
+server:
+	verbosity: 1
+
+    {% for network_interface in interfaces %}
+    {% if dot == "yes" %}
+    interface: {{ network_interface }}@853
+    {% else %}
+    interface: {{ network_interface }}
+    {% endif %}
+    {% endfor %}
+
+    {% if dot == "yes" %}
+    tls-service-key: /etc/unbound/{{ dot_key.split('/') | last }}
+	tls-service-pem: /etc/unbound/{{ dot_crt.split('/') | last }}
+	tls-port: 853
+    {% elif doh == "yes" %}
+    port: 443
+    tls-service-key: /etc/unbound/{{ doh_key.split('/') | last }}
+    tls-service-pem: /etc/unbound/{{ doh_crt.split('/') | last }}
+    {% else %}
+	port: {{ interface_port }}
+    {% endif %}
+
+	do-ip4: {{ do_ipv4 }}
+	do-ip6: {{ do_ipv6 }}
+
+	do-udp: yes
+	do-tcp: yes
+
+    {% for entry in acl %}
+    access-control: {{ entry.range }} {{ entry.state }}
+    {% endfor %}
+
+    directory: "/etc/unbound"
+    use-syslog: yes
+	log-queries: {{ log_queries }}
+	log-replies: {{ log_replies }}
+	log-tag-queryreply: yes
+	log-servfail: no
+
+	hide-identity: yes
+	hide-version: yes
+	hide-trustanchor: yes
+    identity: "{{ identity }}"
+    auto-trust-anchor-file: "/var/lib/unbound/root.key"
+
+# Remote control config section.
+remote-control:
+	control-enable: {{ remote_control }}
+
+    {% if remote_control == "yes" %}
+	control-interface: {{ control_interface }}
+	control-use-cert: "no"
+{% endif %}
+
+forward-zone:
+	name: "."
+    {% for resolver in upstream_resolvers %}
+    forward-addr: {{ resolver }}
+    {% if dot == "yes" or doh == "yes" %}
+    forward-ssl-upstream: yes
+    {% endif %}
+    {% endfor %}

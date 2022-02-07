@@ -1,0 +1,11 @@
+---
+- name: Copy private key / certificate for DoH
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/unbound/{{ item.split('/') | last }}
+    owner: root
+    group: root
+    mode: '0400'
+  with_items:
+    - "{{ doh_key }}"
+    - "{{ doh_crt }}"
